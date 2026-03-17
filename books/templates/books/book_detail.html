@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} — Book Shop{% endblock %}
+{% block nav_books %}active{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'books:book_list' %}" class="text-decoration-none text-muted">
+        <i class="bi bi-arrow-left"></i> До каталогу
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="h2 mb-1">{{ book.title }}</h1>
+                <p class="text-muted mb-2">
+                    <i class="bi bi-pen"></i> {{ book.author }}
+                </p>
+                <div>
+                    {% for cat in book.categories.all %}
+                        <a href="{% url 'books:book_list' %}?category={{ cat.slug }}"
+                           class="badge bg-light text-primary border me-1 text-decoration-none">
+                            <i class="bi bi-tag"></i> {{ cat.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="text-end">
+                <div class="price-badge fs-2 mb-2">{{ book.price }} грн</div>
+                {% if book.stock > 10 %}
+                    <span class="badge bg-success fs-6">
+                        <i class="bi bi-check-circle"></i> {{ book.stock }} шт. на складі
+                    </span>
+                {% elif book.stock > 0 %}
+                    <span class="badge bg-warning text-dark fs-6">
+                        <i class="bi bi-exclamation-triangle"></i> Мало: {{ book.stock }} шт.
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger fs-6">
+                        <i class="bi bi-x-circle"></i> Немає в наявності
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if book.description %}
+        <hr>
+        <h5 class="mb-2">Опис</h5>
+        <p class="text-secondary lh-lg">{{ book.description }}</p>
+        {% endif %}
+
+        <hr>
+        <p class="text-muted small mb-0">
+            <i class="bi bi-calendar-plus"></i> Додано: {{ book.created_at|date:"d.m.Y" }}
+            &nbsp;|&nbsp;
+            <i class="bi bi-calendar-check"></i> Оновлено: {{ book.updated_at|date:"d.m.Y" }}
+        </p>
+    </div>
+
+    <div class="card-footer d-flex gap-2">
+        <a href="{% url 'books:book_update' book.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Редагувати
+        </a>
+        <a href="{% url 'books:book_delete' book.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Видалити
+        </a>
+    </div>
+</div>
+
+<!-- Схожі книги -->
+{% if related %}
+<h4 class="mb-3"><i class="bi bi-stars text-warning"></i> Схожі книги</h4>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+    {% for rb in related %}
+    <div class="col">
+        <div class="card cat-card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <a href="{% url 'books:book_detail' rb.pk %}" class="text-decoration-none text-dark">
+                        {{ rb.title }}
+                    </a>
+                </h6>
+                <p class="text-muted small mb-1">{{ rb.author }}</p>
+                <span class="price-badge">{{ rb.price }} грн</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

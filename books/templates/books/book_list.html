@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Книги — Book Shop{% endblock %}
+{% block nav_books %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="bi bi-journals text-primary"></i> Каталог книг</h2>
+    <span class="text-muted">Знайдено: <strong>{{ total }}</strong></span>
+</div>
+
+<!-- Панель фільтрів -->
+<div class="card filters-panel shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <!-- Пошук -->
+            <div class="col-12 col-md-4">
+                <label class="form-label small fw-semibold">Пошук</label>
+                <input type="text" name="q" class="form-control form-control-sm"
+                       value="{{ query }}" placeholder="Назва або автор...">
+            </div>
+
+            <!-- Категорія -->
+            <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold">Категорія</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">Всі категорії</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}"
+                            {% if selected_category == cat.slug %}selected{% endif %}>
+                            {{ cat.name }} ({{ cat.book_count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Сортування -->
+            <div class="col-6 col-md-2">
+                <label class="form-label small fw-semibold">Сортування</label>
+                <select name="sort" class="form-select form-select-sm">
+                    <option value="title"  {% if sort == 'title'  %}selected{% endif %}>Назва А–Я</option>
+                    <option value="-title" {% if sort == '-title' %}selected{% endif %}>Назва Я–А</option>
+                    <option value="price"  {% if sort == 'price'  %}selected{% endif %}>Ціна ↑</option>
+                    <option value="-price" {% if sort == '-price' %}selected{% endif %}>Ціна ↓</option>
+                </select>
+            </div>
+
+            <!-- Чекбокс + кнопки -->
+            <div class="col-12 col-md-3 d-flex align-items-end gap-2">
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox"
+                           name="in_stock" value="1" id="inStock"
+                           {% if in_stock %}checked{% endif %}>
+                    <label class="form-check-label small" for="inStock">
+                        Тільки в наявності
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm ms-auto">
+                    <i class="bi bi-search"></i>
+                </button>
+                <a href="{% url 'books:book_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Сітка книг -->
+{% if books %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 mb-4">
+    {% for book in books %}
+    <div class="col">
+        <div class="card book-card shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title mb-1">
+                    <a href="{% url 'books:book_detail' book.pk %}"
+                       class="text-decoration-none text-dark stretched-link-title">
+                        {{ book.title }}
+                    </a>
+                </h5>
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-pen"></i> {{ book.author }}
+                </p>
+
+                <div class="mt-auto">
+                    <!-- Категорії -->
+                    <div class="mb-2">
+                        {% for cat in book.categories.all %}
+                            <span class="badge bg-light text-primary border tag-badge me-1">
+                                {{ cat.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="price-badge">{{ book.price }} грн</span>
+
+                        {% if book.stock > 10 %}
+                            <span class="badge bg-success">{{ book.stock }} шт.</span>
+                        {% elif book.stock > 0 %}
+                            <span class="badge bg-warning text-dark">Мало: {{ book.stock }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">Немає</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
+                <a href="{% url 'books:book_detail' book.pk %}"
+                   class="btn btn-outline-primary btn-sm flex-grow-1">
+                    <i class="bi bi-eye"></i> Деталі
+                </a>
+                <a href="{% url 'books:book_update' book.pk %}"
+                   class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'books:book_delete' book.pk %}"
+                   class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Пагінація -->
+{% if is_paginated %}
+<nav aria-label="Пагінація">
+    <ul class="pagination justify-content-center">
+
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if filter_params %}&{{ filter_params }}{% endif %}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if filter_params %}&{{ filter_params }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if filter_params %}&{{ filter_params }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if filter_params %}&{{ filter_params }}{% endif %}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ paginator.num_pages }}{% if filter_params %}&{{ filter_params }}{% endif %}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        {% endif %}
+
+    </ul>
+</nav>
+<p class="text-center text-muted small">
+    Сторінка {{ page_obj.number }} з {{ paginator.num_pages }}
+</p>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-search display-4 text-muted"></i>
+    <p class="mt-3 text-muted">Книг не знайдено. Спробуйте змінити фільтри.</p>
+    <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary">
+        Скинути фільтри
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

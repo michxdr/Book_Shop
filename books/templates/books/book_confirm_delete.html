@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Видалити книгу — Book Shop{% endblock %}
+{% block nav_books %}active{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Підтвердження видалення</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">Ви дійсно хочете видалити книгу:</p>
+                <p class="fw-bold fs-5">«{{ object.title }}»</p>
+                <p class="text-muted small">{{ object.author }}</p>
+                <p class="text-danger small">
+                    <i class="bi bi-info-circle"></i> Цю дію неможливо скасувати.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Так, видалити
+                        </button>
+                        <a href="{% url 'books:book_detail' object.pk %}"
+                           class="btn btn-outline-secondary">
+                            Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
