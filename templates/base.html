@@ -38,11 +38,58 @@
                         <i class="bi bi-tags"></i> Категорії
                     </a>
                 </li>
+                {% if user.is_authenticated and perms.books.add_book %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'books:book_create' %}">
+                        <i class="bi bi-plus-circle"></i> Додати книгу
+                    </a>
+                </li>
+                {% endif %}
             </ul>
 
-            <a href="{% url 'books:book_create' %}" class="btn btn-success btn-sm">
-                <i class="bi bi-plus-circle"></i> Додати книгу
-            </a>
+            <!-- Auth block -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#"
+                           data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="bi bi-person"></i> Профіль
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a class="dropdown-item" href="/admin/">
+                                    <i class="bi bi-gear"></i> Адмінка
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i> Вийти
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Увійти
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm ms-2"
+                           href="{% url 'accounts:register' %}">
+                            <i class="bi bi-person-plus"></i> Реєстрація
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </nav>
@@ -65,7 +112,7 @@
 </main>
 
 <footer class="bg-dark text-white-50 text-center py-3 mt-5">
-    <small><i class="bi bi-book"></i> &copy; 2025 Книжковий магазин</small>
+    <small><i class="bi bi-book"></i> &copy; 2026 Книжковий магазин</small>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

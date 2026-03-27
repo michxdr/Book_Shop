@@ -1,9 +1,14 @@
+import logging
+
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q, Count, Avg
 
 from .models import Book, Category
 from .forms import BookForm
+
+logger = logging.getLogger('books')
 
 
 class BookListView(ListView):
@@ -44,7 +49,6 @@ class BookListView(ListView):
         ctx['sort']              = self.request.GET.get('sort', 'title')
         ctx['total']             = self.get_queryset().count()
 
-        # Зберігаємо фільтри для посилань пагінації (без параметра page)
         get_copy = self.request.GET.copy()
         get_copy.pop('page', None)
         ctx['filter_params'] = get_copy.urlencode()
@@ -68,22 +72,28 @@ class BookDetailView(DetailView):
         return ctx
 
 
-class BookCreateView(CreateView):
+class BookCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
     success_url = reverse_lazy('books:book_list')
+    permission_required = 'books.add_book'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['form_title'] = 'Додати нову книгу'
         return ctx
 
+    def form_valid(self, form):
+        logger.info('Книгу додано: "%s" (user=%s)', form.instance.title, self.request.user)
+        return super().form_valid(form)
 
-class BookUpdateView(UpdateView):
+
+class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
+    permission_required = 'books.change_book'
 
     def get_success_url(self):
         return reverse_lazy('books:book_detail', kwargs={'pk': self.object.pk})
@@ -93,11 +103,20 @@ class BookUpdateView(UpdateView):
         ctx['form_title'] = f'Редагувати: {self.object.title}'
         return ctx
 
+    def form_valid(self, form):
+        logger.info('Книгу оновлено: "%s" (user=%s)', form.instance.title, self.request.user)
+        return super().form_valid(form)
 
-class BookDeleteView(DeleteView):
+
+class BookDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Book
     template_name = 'books/book_confirm_delete.html'
     success_url = reverse_lazy('books:book_list')
+    permission_required = 'books.delete_book'
+
+    def form_valid(self, form):
+        logger.info('Книгу видалено: "%s" (user=%s)', self.object.title, self.request.user)
+        return super().form_valid(form)
 
 
 class CategoryListView(ListView):
