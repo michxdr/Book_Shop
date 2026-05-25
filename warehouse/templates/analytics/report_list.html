@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block nav_analytics %}active{% endblock %}
+{% block title %}{% trans "Stock Reports" %}{% endblock %}
+
+{% block content %}
+<h2>{% trans "Weekly Stock Reports" %}</h2>
+<div class="table-responsive mt-3">
+  <table class="table table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>{% trans "Period" %}</th>
+        <th>{% trans "Total Items" %}</th>
+        <th>{% trans "Total Qty" %}</th>
+        <th>{% trans "Low Stock" %}</th>
+        <th>{% trans "Out of Stock" %}</th>
+        <th>{% trans "In" %}</th>
+        <th>{% trans "Out" %}</th>
+        <th>{% trans "Value" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td>{{ report.week_start }} — {{ report.week_end }}</td>
+        <td>{{ report.total_items }}</td>
+        <td>{{ report.total_quantity }}</td>
+        <td><span class="badge text-bg-warning">{{ report.low_stock_count }}</span></td>
+        <td><span class="badge text-bg-danger">{{ report.out_of_stock_count }}</span></td>
+        <td class="text-success">+{{ report.total_movements_in }}</td>
+        <td class="text-danger">-{{ report.total_movements_out }}</td>
+        <td>${{ report.total_inventory_value }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="text-center text-muted">{% trans "No reports yet." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

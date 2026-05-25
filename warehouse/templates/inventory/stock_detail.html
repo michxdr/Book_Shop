@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block nav_inventory %}active{% endblock %}
+{% block title %}{{ item.book_title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'inventory:stock_list' %}">{% trans "Stock" %}</a></li>
+    <li class="breadcrumb-item active">{{ item.book_title }}</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <h2>{{ item.book_title }}</h2>
+    {% if item.book_isbn %}<p class="text-muted">ISBN: {{ item.book_isbn }}</p>{% endif %}
+  </div>
+  {% if perms.inventory.change_stockitem %}
+  <a href="{% url 'inventory:stock_edit' item.pk %}" class="btn btn-outline-secondary"><i class="bi bi-pencil me-1"></i>{% trans "Edit" %}</a>
+  {% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted small">{% trans "In Stock" %}</div>
+        <div class="display-5 fw-bold">{{ item.quantity }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted small">{% trans "Reserved" %}</div>
+        <div class="display-5 fw-bold text-warning">{{ item.reserved_quantity }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted small">{% trans "Available" %}</div>
+        <div class="display-5 fw-bold {% if item.is_out_of_stock %}text-danger{% elif item.is_low_stock %}text-warning{% else %}text-success{% endif %}">
+          {{ item.available_quantity }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="text-muted small">{% trans "Location" %}</div>
+        <div class="display-5 fw-bold"><code>{{ item.location|default:"—" }}</code></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if alerts %}
+<div class="alert alert-warning">
+  <strong>{% trans "Active alerts:" %}</strong>
+  {% for alert in alerts %}<div>{{ alert.get_alert_type_display }}: {{ alert.message }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<h5 class="mt-4 mb-3">{% trans "Recent Movements" %}</h5>
+<div class="table-responsive">
+  <table class="table table-sm">
+    <thead><tr><th>{% trans "Type" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Reference" %}</th><th>{% trans "Note" %}</th><th>{% trans "By" %}</th><th>{% trans "Date" %}</th></tr></thead>
+    <tbody>
+      {% for m in movements %}
+      <tr>
+        <td><span class="badge {% if m.quantity >= 0 %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ m.get_movement_type_display }}</span></td>
+        <td class="{% if m.quantity >= 0 %}text-success{% else %}text-danger{% endif %}">{% if m.quantity >= 0 %}+{% endif %}{{ m.quantity }}</td>
+        <td><small>{{ m.reference_id|default:"—" }}</small></td>
+        <td><small class="text-muted">{{ m.note|truncatechars:40 }}</small></td>
+        <td>{{ m.created_by|default:"system" }}</td>
+        <td><small>{{ m.created_at|date:"d.m.Y H:i" }}</small></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center text-muted">{% trans "No movements yet." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

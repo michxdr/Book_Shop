@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block nav_inventory %}active{% endblock %}
+{% block title %}{% trans "Stock" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-box-seam me-2"></i>{% trans "Stock List" %}</h2>
+  {% if perms.inventory.add_stockitem %}
+  <a href="{% url 'inventory:stock_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{% trans "Add Item" %}</a>
+  {% endif %}
+</div>
+
+<!-- Stats row -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-bg-primary">
+      <div class="card-body"><h5 class="card-title">{% trans "Total Items" %}</h5><p class="display-6">{{ total_items }}</p></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-warning">
+      <div class="card-body"><h5 class="card-title">{% trans "Low Stock" %}</h5><p class="display-6">{{ low_stock_count }}</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-5">
+    <input type="text" name="q" class="form-control" placeholder="{% trans 'Search books...' %}" value="{{ search }}">
+  </div>
+  <div class="col-md-3">
+    <select name="status" class="form-select">
+      <option value="">{% trans "All" %}</option>
+      <option value="low" {% if status_filter == 'low' %}selected{% endif %}>{% trans "Low Stock" %}</option>
+      <option value="out" {% if status_filter == 'out' %}selected{% endif %}>{% trans "Out of Stock" %}</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-secondary w-100">{% trans "Filter" %}</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>{% trans "Book" %}</th>
+        <th>{% trans "Location" %}</th>
+        <th>{% trans "In Stock" %}</th>
+        <th>{% trans "Reserved" %}</th>
+        <th>{% trans "Available" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>
+          <div class="fw-semibold">{{ item.book_title }}</div>
+          {% if item.book_isbn %}<small class="text-muted">ISBN: {{ item.book_isbn }}</small>{% endif %}
+        </td>
+        <td><code>{{ item.location|default:"—" }}</code></td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.reserved_quantity }}</td>
+        <td>
+          <span class="fw-bold {% if item.is_out_of_stock %}text-danger{% elif item.is_low_stock %}text-warning{% else %}text-success{% endif %}">
+            {{ item.available_quantity }}
+          </span>
+        </td>
+        <td>
+          {% if item.is_out_of_stock %}
+            <span class="badge text-bg-danger">{% trans "Out of stock" %}</span>
+          {% elif item.is_low_stock %}
+            <span class="badge text-bg-warning">{% trans "Low stock" %}</span>
+          {% else %}
+            <span class="badge text-bg-success">{% trans "OK" %}</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'inventory:stock_detail' item.pk %}" class="btn btn-sm btn-outline-primary">{% trans "Details" %}</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center text-muted py-4">{% trans "No items found." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<nav><ul class="pagination justify-content-center">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search }}&status={{ status_filter }}">«</a></li>{% endif %}
+  <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search }}&status={{ status_filter }}">»</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

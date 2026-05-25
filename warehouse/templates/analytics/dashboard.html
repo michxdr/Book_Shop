@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block nav_analytics %}active{% endblock %}
+{% block title %}{% trans "Analytics Dashboard" %}{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-bar-chart me-2"></i>{% trans "Analytics Dashboard" %}</h2>
+
+<div class="row g-3 mt-2">
+  <div class="col-md-3">
+    <div class="card text-bg-primary h-100">
+      <div class="card-body">
+        <div class="small opacity-75">{% trans "Total SKUs" %}</div>
+        <div class="display-5 fw-bold">{{ total_items }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-info h-100">
+      <div class="card-body">
+        <div class="small opacity-75">{% trans "Total Units" %}</div>
+        <div class="display-5 fw-bold">{{ total_quantity }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-warning h-100">
+      <div class="card-body">
+        <div class="small opacity-75">{% trans "Low Stock" %}</div>
+        <div class="display-5 fw-bold">{{ low_stock_items|length }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-danger h-100">
+      <div class="card-body">
+        <div class="small opacity-75">{% trans "Out of Stock" %}</div>
+        <div class="display-5 fw-bold">{{ out_of_stock_items|length }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-2">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">{% trans "Low Stock Books" %}</div>
+      <ul class="list-group list-group-flush">
+        {% for item in low_stock_items|slice:":10" %}
+        <li class="list-group-item d-flex justify-content-between">
+          <a href="{% url 'inventory:stock_detail' item.pk %}">{{ item.book_title }}</a>
+          <span class="badge text-bg-warning">{{ item.available_quantity }} {% trans "left" %}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">{% trans "None" %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">{% trans "Recent Weekly Reports" %}</div>
+      <ul class="list-group list-group-flush">
+        {% for report in recent_reports %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>{{ report.week_start }} — {{ report.week_end }}</span>
+          <span class="text-muted small">{{ report.total_quantity }} {% trans "units" %}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">{% trans "No reports yet." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

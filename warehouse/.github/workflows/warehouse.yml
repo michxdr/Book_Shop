@@ -1,0 +1,88 @@
+name: Warehouse CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'warehouse/**'
+      - '.github/workflows/warehouse.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'warehouse/**'
+
+defaults:
+  run:
+    working-directory: warehouse
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install flake8 black
+      - run: flake8 . --max-line-length=120 --exclude=migrations,staticfiles
+      - run: black --check . --line-length=120
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: warehouse_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 10s
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements-dev.txt
+      - name: Run tests with coverage
+        run: |
+          python -m pytest tests/ \
+            --cov=inventory --cov=analytics --cov=accounts \
+            --cov-report=xml --cov-report=term-missing \
+            --cov-fail-under=70
+        env:
+          DJANGO_SETTINGS_MODULE: warehouse.settings.test
+      - uses: codecov/codecov-action@v4
+        with:
+          files: warehouse/coverage.xml
+          flags: warehouse
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./warehouse
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/warehouse:latest,${{ secrets.DOCKERHUB_USERNAME }}/warehouse:${{ github.sha }}

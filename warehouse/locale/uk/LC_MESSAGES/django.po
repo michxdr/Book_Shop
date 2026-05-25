@@ -1,0 +1,192 @@
+# Ukrainian translations for Warehouse
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+
+msgid "Warehouse Management"
+msgstr "Управління складом"
+
+msgid "Stock"
+msgstr "Запаси"
+
+msgid "Alerts"
+msgstr "Сповіщення"
+
+msgid "Analytics"
+msgstr "Аналітика"
+
+msgid "Login"
+msgstr "Вхід"
+
+msgid "Logout"
+msgstr "Вихід"
+
+msgid "In Stock"
+msgstr "На складі"
+
+msgid "Reserved"
+msgstr "Зарезервовано"
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "Location"
+msgstr "Місце"
+
+msgid "Out of stock"
+msgstr "Відсутній"
+
+msgid "Low stock"
+msgstr "Мало"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Details"
+msgstr "Деталі"
+
+msgid "All"
+msgstr "Всі"
+
+msgid "Low Stock"
+msgstr "Низький запас"
+
+msgid "Out of Stock"
+msgstr "Відсутній на складі"
+
+msgid "Filter"
+msgstr "Фільтр"
+
+msgid "Add Item"
+msgstr "Додати позицію"
+
+msgid "Stock List"
+msgstr "Список запасів"
+
+msgid "Total Items"
+msgstr "Всього позицій"
+
+msgid "Save"
+msgstr "Зберегти"
+
+msgid "Cancel"
+msgstr "Скасувати"
+
+msgid "Edit"
+msgstr "Редагувати"
+
+msgid "Recent Movements"
+msgstr "Останні рухи"
+
+msgid "No movements yet."
+msgstr "Немає рухів."
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Note"
+msgstr "Примітка"
+
+msgid "By"
+msgstr "Ким"
+
+msgid "Reference"
+msgstr "Референс"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Qty"
+msgstr "К-сть"
+
+msgid "Profile"
+msgstr "Профіль"
+
+msgid "Role"
+msgstr "Роль"
+
+msgid "Department"
+msgstr "Відділ"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Edit Profile"
+msgstr "Редагувати профіль"
+
+msgid "Active alerts:"
+msgstr "Активні сповіщення:"
+
+msgid "Show resolved"
+msgstr "Показати вирішені"
+
+msgid "Warehouse Alerts"
+msgstr "Сповіщення складу"
+
+msgid "No active alerts."
+msgstr "Немає активних сповіщень."
+
+msgid "Analytics Dashboard"
+msgstr "Панель аналітики"
+
+msgid "Total SKUs"
+msgstr "Всього SKU"
+
+msgid "Total Units"
+msgstr "Всього одиниць"
+
+msgid "Low Stock Books"
+msgstr "Книги з низьким запасом"
+
+msgid "None"
+msgstr "Відсутні"
+
+msgid "Recent Weekly Reports"
+msgstr "Останні тижневі звіти"
+
+msgid "No reports yet."
+msgstr "Немає звітів."
+
+msgid "left"
+msgstr "залишилось"
+
+msgid "units"
+msgstr "одиниць"
+
+msgid "Weekly Stock Reports"
+msgstr "Тижневі звіти складу"
+
+msgid "Period"
+msgstr "Період"
+
+msgid "Total Qty"
+msgstr "Загальна к-сть"
+
+msgid "Value"
+msgstr "Вартість"
+
+msgid "In"
+msgstr "Прихід"
+
+msgid "Out"
+msgstr "Видаток"
+
+msgid "API Docs"
+msgstr "API Docs"
+
+msgid "Warehouse Login"
+msgstr "Вхід до складу"
+
+msgid "Search books..."
+msgstr "Пошук книг..."
+
+msgid "Add Stock Item"
+msgstr "Додати позицію складу"
+
+msgid "Edit Stock Item"
+msgstr "Редагувати позицію"
+
+msgid "No items found."
+msgstr "Позицій не знайдено."

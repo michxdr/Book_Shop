@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h4>{{ user.get_full_name|default:user.username }}</h4>
+        <p class="text-muted">{{ user.email }}</p>
+        <dl class="row">
+          <dt class="col-4">{% trans "Role" %}</dt><dd class="col-8">{{ user.get_role_display }}</dd>
+          <dt class="col-4">{% trans "Department" %}</dt><dd class="col-8">{{ user.department|default:"—" }}</dd>
+          <dt class="col-4">{% trans "Phone" %}</dt><dd class="col-8">{{ user.phone|default:"—" }}</dd>
+        </dl>
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary">{% trans "Edit Profile" %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
